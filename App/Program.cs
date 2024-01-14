@@ -65,6 +65,9 @@ static ReplicaInfo BuildReplicaInfo(IServiceProvider serviceProvider)
 static ICredentialsProvider BuildCreadentialsProvider(IServiceProvider serviceProvider)
 {
     var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+    var serviceAccountKey = configuration["YDB_SERVICE_ACCOUNT_KEY_CREDENTIALS"];
+    if (serviceAccountKey is not null)
+        return new ServiceAccountKeyProvider(serviceAccountKey);
     var serviceAccountKeyFile = configuration["YDB_SERVICE_ACCOUNT_KEY_FILE_CREDENTIALS"];
     if (serviceAccountKeyFile is not null)
         return new ServiceAccountProvider(serviceAccountKeyFile);
