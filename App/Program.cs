@@ -12,6 +12,9 @@ var builder = WebApplication.CreateBuilder();
 builder.Configuration.AddEnvironmentVariables();
 builder.Configuration.AddUserSecrets(Assembly.GetExecutingAssembly());
 
+var port = builder.Configuration["PORT"] ?? "8080";
+builder.WebHost.UseUrls($"http://*:{port}");
+
 builder.Services.AddLogging();
 builder.Services.AddCors();
 
@@ -58,7 +61,7 @@ static async Task<Driver> BuildDriver(IServiceProvider serviceProvider)
 static ReplicaInfo BuildReplicaInfo(IServiceProvider serviceProvider)
 {
     var configuration = serviceProvider.GetRequiredService<IConfiguration>();
-    var version = configuration["BACKEND_VERSION"] ?? "undefined";
+    var version = configuration["BACKEND_VERSION"].IsNullOrEmpty() ? "undefined" : configuration["BACKEND_VERSION"];
     return new ReplicaInfo(version, $"yc-service-{Guid.NewGuid().ToString()}");
 }
 
