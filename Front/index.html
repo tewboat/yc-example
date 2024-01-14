@@ -12,6 +12,7 @@
   <button type="submit">Добавить запись</button>
  </form>
  <p>Идентификатор реплики: <span id="replica-id"></span></p>
+ <p>Версия реплики: <span id="replica-version"></span></p>
 
  <script>
   function loadRecords() {
@@ -51,7 +52,8 @@
    fetch('http://localhost:5252/replica', {mode: 'cors'})
     .then(response => response.json())
     .then(replicaInfo => {
-     document.getElementById('replica-id').textContent = replicaInfo.replicaId;
+     document.getElementById('replica-id').textContent = replicaInfo.id;
+     document.getElementById('replica-version').textContent = replicaInfo.version;
     });
   }
 
