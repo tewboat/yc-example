@@ -1,0 +1,100 @@
+openapi: "3.0.0"
+
+info:
+  version: 1.0.0
+  title: Wall
+
+x-yc-apigateway:
+  service_account_id: ${SERVICE_ACCOUNT_ID}
+  cors:
+    origin: '*'
+    methods: '*'
+    allowedHeaders: '*'
+
+paths:
+  /replica:
+    get:
+      summary: Get replica info
+      operationId: getReplicaInfo
+      responses:
+        '200':
+          description: Success request
+          content:
+            application/json:
+               schema:
+                 $ref: '#/components/schemas/ReplicaInfo'
+      x-yc-apigateway-integration:
+        type: serverless_containers
+        container_id: ${CONTAINER_ID}
+  /records:
+    get:
+      summary: List of records
+      operationId: listRecords
+      responses:
+        '200':
+          description: Success request
+          content:
+            application/json:
+               schema:
+                 $ref: '#/components/schemas/ListRecords'
+      x-yc-apigateway-integration:
+        type: serverless_containers
+        container_id: ${CONTAINER_ID}
+    post:
+      summary: Create record
+      operationId: createRecord
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRecord'
+      responses:
+        '201':
+          description: Success creation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Record'
+        '400':
+          description: Bad request
+      x-yc-apigateway-integration:
+        type: serverless_containers
+        container_id: ${CONTAINER_ID}
+  /:
+    get:
+      operationId: index
+      x-yc-apigateway-integration:
+        type: object_storage
+        bucket: ${BUCKET_NAME}
+        object: index.html
+      responses:
+        '200':
+          description: Returns index.html
+
+components:
+  schemas:
+    ReplicaInfo:
+      title: replicaInfo
+      properties:
+        version:
+          type: string
+        id:
+          type: string
+    Record:
+      title: Record
+      properties:
+        text:
+          type: string
+    ListRecords:
+      type: array
+      title: List records
+      items:
+        $ref: '#/components/schemas/Record'
+    CreateRecord:
+      title: Create Record Request
+      required:
+        - text
+      properties:
+        text:
+          type: string
