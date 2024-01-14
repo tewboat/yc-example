@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+ <title>Список записей</title>
+</head>
+<body>
+ <h1>Список записей</h1>
+ <ul id="records-list"></ul>
+ <form id="add-record-form">
+  <label for="record-text">Текст записи:</label>
+  <input type="text" id="record-text" name="record-text">
+  <button type="submit">Добавить запись</button>
+ </form>
+ <p>Идентификатор реплики: <span id="replica-id"></span></p>
+
+ <script>
+  function loadRecords() {
+   fetch('http://localhost:5252/records', {mode: 'cors'})
+    .then(response => response.json())
+    .then(records => {
+     const recordsList = document.getElementById('records-list');
+     records.forEach(record => {
+      const li = document.createElement('li');
+      li.textContent = record.text;
+      recordsList.appendChild(li);
+        });
+    });
+  }
+
+  function addRecord(event) {
+   event.preventDefault();
+   const recordText = document.getElementById('record-text').value;
+   fetch('http://localhost:5252/records', {
+    mode: 'cors',
+    method: 'POST',
+    headers: {
+     'Content-Type': 'application/json',
+     'Accept': '*/*'
+    },
+    body: JSON.stringify( {text: recordText} )
+    })
+   .then(response => {
+    if (response.ok) {
+     loadRecords();
+     document.getElementById('record-text').value = '';
+        }
+    });
+  }
+
+  function loadReplicaId() {
+   fetch('http://localhost:5252/replica', {mode: 'cors'})
+    .then(response => response.json())
+    .then(replicaInfo => {
+     document.getElementById('replica-id').textContent = replicaInfo.replicaId;
+    });
+  }
+
+  loadRecords();
+  loadReplicaId();
+
+  document.getElementById('add-record-form').addEventListener('submit', addRecord);
+ </script>
+</body>
+</html>
